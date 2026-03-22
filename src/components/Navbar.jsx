@@ -87,6 +87,16 @@ const links = [
     )
   },
   {
+    id: 'qr-extractor',
+    label: 'QR Extract',
+    href: '/qr-extractor',
+    icon: (
+      <svg className="nav-icon" viewBox="0 0 24 24" fill="none" role="presentation">
+        <path d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4M8 12h8M12 8v8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
     id: 'analyzer',
     label: 'Analyzer',
     href: '/analyzer',

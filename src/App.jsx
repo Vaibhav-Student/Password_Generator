@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
@@ -10,6 +11,7 @@ import StrengthCheckerPage from './pages/StrengthCheckerPage';
 import PassphraseGeneratorPage from './pages/PassphraseGeneratorPage';
 import UsernameGeneratorPage from './pages/UsernameGeneratorPage';
 import QRCodeSharePage from './pages/QRCodeSharePage';
+import QRCodeExtractorPage from './pages/QRCodeExtractorPage';
 import FunPasswordModePage from './pages/FunPasswordModePage';
 import PatternPasswordGeneratorPage from './pages/PatternPasswordGeneratorPage';
 import SmartPasswordGeneratorPage from './pages/SmartPasswordGeneratorPage';
@@ -20,6 +22,12 @@ import PasswordMemoryScorePage from './pages/PasswordMemoryScorePage';
 import PasswordRotationPage from './pages/PasswordRotationPage';
 
 function App() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return (
     <div className="app-shell">
       <div className="background-layer" aria-hidden="true">
@@ -42,6 +50,7 @@ function App() {
               <Route path="/fun-password" element={<FunPasswordModePage />} />
               <Route path="/usernames" element={<UsernameGeneratorPage />} />
               <Route path="/qr-share" element={<QRCodeSharePage />} />
+              <Route path="/qr-extractor" element={<QRCodeExtractorPage />} />
               <Route path="/analyzer" element={<StrengthCheckerPage />} />
               <Route path="/crack-time" element={<CrackTimeEstimatorPage />} />
               <Route path="/pin-generator" element={<PinGeneratorPage />} />

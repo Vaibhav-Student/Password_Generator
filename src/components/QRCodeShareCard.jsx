@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import QRCode from 'qrcode';
 import { copyText, generatePassword } from '../utils/passwordUtils';
-
-function escapeWifiText(value) {
-  return value.replace(/([\\;,:\"])/g, '\\$1');
-}
+import { buildInternalQrPayload } from '../utils/qrPayloadUtils';
 
 function QRCodeShareCard() {
   const [password, setPassword] = useState('');
@@ -24,17 +21,11 @@ function QRCodeShareCard() {
   const isWifiMode = mode === 'wifi';
 
   const payloadNote = useMemo(() => {
-    if (!isWifiMode) {
-      return 'Payload format: plain text password';
+    if (isWifiMode && ssid.trim()) {
+      return `Payload format: SecurePass signed payload (WiFi, SSID: ${ssid.trim()})`;
     }
-
-    if (!ssid.trim()) {
-      return 'Payload format: WIFI:T:WPA;S:<network>;P:<password>;;';
-    }
-
-    const safeType = wifiType === 'nopass' ? 'nopass' : wifiType;
-    return `Payload format: WIFI:T:${safeType};S:${ssid.trim()};P:${safeType === 'nopass' ? '' : '********'};;`;
-  }, [isWifiMode, ssid, wifiType]);
+    return 'Payload format: SecurePass signed payload (internal only)';
+  }, [isWifiMode, ssid]);
 
   const showToast = (message) => {
     setToast(message);
@@ -80,11 +71,14 @@ function QRCodeShareCard() {
       return;
     }
 
-    const payload = !isWifiMode
-      ? currentPassword
-      : `WIFI:T:${wifiType === 'nopass' ? 'nopass' : wifiType};S:${escapeWifiText(ssid.trim())};P:${wifiType === 'nopass' ? '' : escapeWifiText(currentPassword)};;`;
-
     try {
+      const payload = await buildInternalQrPayload({
+        mode: isWifiMode ? 'wifi' : 'password',
+        password: wifiType === 'nopass' ? '' : currentPassword,
+        ssid: isWifiMode ? ssid.trim() : '',
+        wifiType: isWifiMode ? wifiType : 'WPA'
+      });
+
       const dataUrl = await QRCode.toDataURL(payload, {
         width: 320,
         margin: 2,
@@ -414,7 +408,7 @@ function QRCodeShareCard() {
 
         <div className="qr-feature-list">
           <p><strong>Useful for:</strong> WiFi sharing, account setup between devices, quick secure transfer.</p>
-          <p><strong>Flow:</strong> Enter password, generate QR, scan with phone, copy instantly.</p>
+          <p><strong>Flow:</strong> Enter password, generate QR, then decode using SecurePass QR Extractor.</p>
         </div>
       </section>
     </div>
