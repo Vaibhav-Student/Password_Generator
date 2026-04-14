@@ -169,7 +169,7 @@ const links = [
   }
 ];
 
-function Navbar() {
+function Navbar({ collapsed = false, onToggleCollapsed = () => {} }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -185,7 +185,7 @@ function Navbar() {
         <span />
       </button>
 
-      <aside className={`sidebar ${open ? 'open' : ''}`}>
+      <aside className={`sidebar ${open ? 'open' : ''} ${collapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-brand">
           <span className="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" role="presentation">
@@ -201,6 +201,24 @@ function Navbar() {
           </div>
         </div>
 
+        <button
+          type="button"
+          className={`sidebar-collapse-btn ${collapsed ? 'collapsed' : ''}`}
+          onClick={onToggleCollapsed}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!collapsed}
+        >
+          <svg viewBox="0 0 24 24" fill="none" role="presentation">
+            <path
+              d="m14 6-6 6 6 6"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+
         <nav className="sidebar-nav">
           {links.map((link) => (
             <NavLink
@@ -208,9 +226,10 @@ function Navbar() {
               to={link.href}
               className={({ isActive }) => (isActive ? 'active' : '')}
               onClick={() => setOpen(false)}
+              title={collapsed ? link.label : undefined}
             >
               {link.icon}
-              {link.label}
+              <span className="nav-label">{link.label}</span>
             </NavLink>
           ))}
         </nav>

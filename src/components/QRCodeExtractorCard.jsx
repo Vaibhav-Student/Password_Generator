@@ -146,30 +146,48 @@ function QRCodeExtractorCard() {
 
         <section className="options-section mt-4">
           <h3>Upload QR Image</h3>
-          <div className="qr-extractor-upload-row">
-            <label htmlFor="qr-extractor-file" className="icon-btn qr-extractor-action-btn">
-              <svg viewBox="0 0 24 24" fill="none" role="presentation">
-                <path d="M12 16V4m0 0-4 4m4-4 4 4M4 20h16" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Choose Image
-            </label>
+          <div className={`qr-upload-zone ${isScanning ? 'scanning' : ''}`}>
             <input
               id="qr-extractor-file"
               ref={fileInputRef}
               type="file"
               accept="image/png,image/jpeg,image/webp,image/bmp"
               onChange={handleFileChange}
-              className="sr-only"
+              className="qr-upload-input"
+              title="Drop an image here or click to select"
             />
-
-            <button type="button" className="icon-btn qr-extractor-action-btn" onClick={resetExtractor}>
-              <svg viewBox="0 0 24 24" fill="none" role="presentation">
-                <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m-8 0v13a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Clear
-            </button>
+            {fileName ? (
+              <div className="qr-uploaded-state">
+                <div className="qr-file-icon">
+                  <svg viewBox="0 0 24 24" fill="none" role="presentation">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div className="qr-file-details">
+                  <span className="qr-file-name">{fileName}</span>
+                  <span className="qr-file-status">{isScanning ? 'Decoding QR...' : 'Ready'}</span>
+                </div>
+                <button type="button" className="icon-btn qr-clear-btn" onClick={resetExtractor} aria-label="Clear selected file">
+                  <svg viewBox="0 0 24 24" fill="none" role="presentation">
+                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <label htmlFor="qr-extractor-file" className="qr-upload-label">
+                <div className="qr-upload-icon-wrapper">
+                  <svg viewBox="0 0 24 24" fill="none" role="presentation">
+                    <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <div className="qr-upload-text">
+                  <span className="qr-upload-primary">Click or drop an image here</span>
+                  <span className="qr-upload-secondary">PNG, JPG, WEBP, or BMP up to 8MB</span>
+                </div>
+              </label>
+            )}
           </div>
-          <p className="qr-extractor-file-name">{fileName || 'No file selected'}</p>
         </section>
 
         {isScanning ? <p className="qr-extractor-status">Scanning QR code...</p> : null}

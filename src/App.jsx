@@ -1,9 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
-// Use the existing or create simple wrappers for pages
 import HomePage from './pages/HomePage';
 import PasswordGeneratorPage from './pages/PasswordGeneratorPage';
 import HistoryPage from './pages/HistoryPage';
@@ -23,21 +22,55 @@ import PasswordRotationPage from './pages/PasswordRotationPage';
 
 function App() {
   const { pathname } = useLocation();
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const cursorDotRef = useRef(null);
+  const cursorRingRef = useRef(null);
+  const mousePos = useRef({ x: 0, y: 0 });
+  const ringPos = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      mousePos.current = { x: e.clientX, y: e.clientY };
+      if (cursorDotRef.current) {
+        cursorDotRef.current.style.transform = `translate(${e.clientX - 6}px, ${e.clientY - 6}px)`;
+      }
+    };
+
+    let animId;
+    const animate = () => {
+      const lerp = 0.12;
+      ringPos.current.x += (mousePos.current.x - ringPos.current.x) * lerp;
+      ringPos.current.y += (mousePos.current.y - ringPos.current.y) * lerp;
+      if (cursorRingRef.current) {
+        cursorRingRef.current.style.transform = `translate(${ringPos.current.x - 18}px, ${ringPos.current.y - 18}px)`;
+      }
+      animId = requestAnimationFrame(animate);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    animId = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animId);
+    };
+  }, []);
+
   return (
     <div className="app-shell">
-      <div className="background-layer" aria-hidden="true">
-        <span className="glow-blob blob-a" />
-        <span className="glow-blob blob-b" />
-        <span className="glow-blob blob-c" />
-      </div>
+      <div className="cursor-dot" ref={cursorDotRef} />
+      <div className="cursor-ring" ref={cursorRingRef} />
 
-      <div className="app-layout">
-        <Navbar />
+      <div className={`app-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        <Navbar
+          collapsed={sidebarCollapsed}
+          onToggleCollapsed={() => setSidebarCollapsed((prev) => !prev)}
+        />
 
         <div className="content-shell">
           <main className="page-content">
@@ -69,5 +102,3 @@ function App() {
 }
 
 export default App;
-
-
